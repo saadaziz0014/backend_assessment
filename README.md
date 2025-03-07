@@ -1,121 +1,45 @@
-# Kafka Integration Hiring Task
+# Kafka Implementation Summary
 
-## Task Overview
-You are required to integrate Kafka into a TodoList application and set up a Notification Service. The TodoList APIs are already built, and your job is to:
+## Overview
+This project involves setting up and optimizing Kafka for handling message streaming efficiently. It includes Kafka setup, producer and consumer implementation, and a notification service.
 
-1. Publish a Kafka event whenever a task is **created**, **updated**, or **deleted**.
-2. Develop a Notification Service that:
-   - Consumes these Kafka messages.
-   - Generates appropriate notifications.
-   - Provides an API to retrieve notifications.
+## Key Steps
 
-## Requirements 
-- Set up **Kafka producer** in the TodoList application to publish task events.
-- Develop a **Kafka consumer** in the Notification Service to consume these events.
-- Implement a **notification storage mechanism** (in-memory database, SQLite, or any lightweight database).
-- Build a **notifications API** to allow users to fetch notifications.
-- Provide a clear README explaining setup and execution.
+### 1. **Understanding Kafka Architecture**
+- Learned core concepts: **Topics, Partitions, Consumers, Consumer Groups**.
+- Explored **Kafka's load balancing** mechanism.
 
-## Tech Stack
-- Backend: **Node.js (Express.js)**
-- Kafka: **Apache Kafka**
-- Database: **SQLite/PostgreSQL/MongoDB (optional)**
+### 2. **Setting Up Kafka**
+- Used **Zookeeper** and **Confluent Kafka**.
+- Created a **Docker Compose** file to run their images.
 
-## Project Structure
-```
-/kafka-todo-app
-│── /todolist-service
-│   ├── producer.js  (Kafka producer setup)
-│   ├── app.js       (Main application logic)
-│── /notification-service
-│── docker-compose.yml (Kafka setup)
-│── README.md
-```
+### 3. **Code Optimization**
+- Optimized **boilerplate** code.
+- Kept **client** as a separate module.
+- Created an **admin file** for topic initialization and existence checks.
 
-## Boilerplate Code
+### 4. **Producer Setup**
+- Updated the **producer**.
+- Integrated the **separate client**.
 
-### TodoList Service - Kafka Producer (producer.js)
-```javascript
-const { Kafka } = require('kafkajs');
+### 5. **Consumer Service Implementation**
+- Created a **consumer service** with an initial single **consumer group**.
+- Designed it to allow future group updates.
+- While consuming messages, **sent data to the notification service**.
 
-const kafka = new Kafka({ clientId: 'todolist', brokers: ['localhost:9092'] });
-const producer = kafka.producer();
+### 6. **Notification Service**
+- Built a **dedicated notification service**.
+- Parsed **schema-based data** before insertion.
+- Implemented a **paginated API** for fetching notifications.
+- Added a **notification route** in `app.js`.
 
-const publishEvent = async (eventType, task) => {
-    await producer.connect();
-    await producer.send({
-        topic: 'task-events',
-        messages: [{ key: eventType, value: JSON.stringify(task) }],
-    });
-    await producer.disconnect();
-};
+### 7. **Database Selection and Schema Validation**
+- Chose **MongoDB** for **lightweight and flexible** data handling.
+- Used **Zod** for **schema validation**.
 
-module.exports = { publishEvent };
-```
+## Conclusion
+This setup ensures a **scalable and efficient Kafka-based messaging system**, with a structured consumer-producer workflow and integrated notification handling.
 
-### TodoList Service - Main Application (app.js)
-```javascript
-const express = require('express');
-const { publishEvent } = require('./producer');
-
-const app = express();
-app.use(express.json());
-
-let tasks = [];
-
-app.post('/tasks', async (req, res) => {
-    const task = { id: tasks.length + 1, ...req.body };
-    tasks.push(task);
-    await publishEvent('task_created', task);
-    res.status(201).json(task);
-});
-
-app.put('/tasks/:id', async (req, res) => {
-    const id = parseInt(req.params.id);
-    const taskIndex = tasks.findIndex(t => t.id === id);
-    if (taskIndex === -1) return res.status(404).json({ message: 'Task not found' });
-
-    tasks[taskIndex] = { ...tasks[taskIndex], ...req.body };
-    await publishEvent('task_updated', tasks[taskIndex]);
-    res.json(tasks[taskIndex]);
-});
-
-app.delete('/tasks/:id', async (req, res) => {
-    const id = parseInt(req.params.id);
-    const taskIndex = tasks.findIndex(t => t.id === id);
-    if (taskIndex === -1) return res.status(404).json({ message: 'Task not found' });
-
-    const deletedTask = tasks.splice(taskIndex, 1)[0];
-    await publishEvent('task_deleted', deletedTask);
-    res.json(deletedTask);
-});
-
-const PORT = 3000;
-app.listen(PORT, () => console.log(`TodoList Service running on port ${PORT}`));
-```
-
-## Setup Instructions
-
-### 1. Prerequisites
-- Install **Docker & Docker Compose** (recommended for Kafka setup)
-- Install **Node.js**
-
-### 2. Start Kafka Using Docker
-```sh
-docker-compose up -d
-```
-
-### 3. Run TodoList Service
-```sh
-cd todolist-service
-npm install  
-npm start    
-```
-
-## Evaluation Criteria
-- Code quality & best practices.
-- Proper Kafka integration.
-- Well-structured & documented code.
-
-Happy coding!
-
+## References
+- [Kafka Documentation](https://kafka.apache.org/documentation/)
+- [Pyush Garg](https://youtu.be/ZJJHm_bd9Zo?si=WAxhA1bOXvEjeiZA)

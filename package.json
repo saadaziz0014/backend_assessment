@@ -1,0 +1,20 @@
+{
+  "name": "backend_assessment",
+  "version": "1.0.0",
+  "description": "You are required to integrate Kafka into a TodoList application and set up a Notification Service. The TodoList APIs are already built, and your job is to:",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon todolist-Service/app.js",
+    "start": "node todolist-Service/app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "kafkajs": "^2.2.4",
+    "mongoose": "^8.12.1",
+    "zod": "^3.24.2"
+  }
+}
